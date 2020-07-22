@@ -1,5 +1,4 @@
 import { User, State } from '../models/user'
-import Axios from 'axios'
 import { TelegrafContext } from 'telegraf/typings/context'
 import { Markup } from 'telegraf'
 
