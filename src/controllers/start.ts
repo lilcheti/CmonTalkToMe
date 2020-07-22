@@ -31,13 +31,13 @@ export const payload = async (ctx: TC) => {
     } else {
         let contact: User | undefined = undefined
         if (ctx.startPayload) {
-            contact = await User.findOne({ telegram_id: String(ctx.startPayload) })
+            contact = await User.findOne(String(ctx.startPayload))
         }
         if (!contact) {
             ctx.reply(greeting)
         } else {
             user.state = State.MESSAGING
-            user.messagingTo = contact.telegram_id
+            user.messagingTo = contact.id
             user.save().then(() => {
                 ctx.reply(greeting + '\n\n' + `شما از طریق لینک '${contact!.name}' وارد شده‌اید، پیامت به '${contact!.name}' رو بنویس`)
             }).catch((error) => {

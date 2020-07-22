@@ -11,7 +11,7 @@ export const setName = async (ctx: TelegrafContext) => {
         user.save().then(() => {
             ctx.reply('نام مورد نظر را وارد کنید')
         }).catch((error) => {
-            console.log(error)
+            console.error(error)
             ctx.reply('خطایی رخ داده است')
         })
     }
@@ -22,14 +22,13 @@ export const setNameStep2 = async (ctx: TelegrafContext, user: User) => {
     user.save().then((user) => {
         ctx.reply(`نام شما ثبت شد: ${user.name}`)
     }).catch((error) => {
-        console.log(error)
+        console.error(error)
         ctx.reply('خطایی رخ داده است')
     })
 }
 
-export const block = async (ctx: TelegrafContext, user: User, toBlock: string) => {
-    let contact = await User.findOne({ telegram_id: toBlock }, { relations: ['blocked'] })
-    console.log(toBlock)
+export const block = async (ctx: TelegrafContext, user: User, toBlock: number) => {
+    let contact = await User.findOne(toBlock, { relations: ['blocked'] })
     if (!contact) {
         ctx.reply('Not allowed')
     } else {
@@ -38,7 +37,7 @@ export const block = async (ctx: TelegrafContext, user: User, toBlock: string) =
             const table = new AsciiTable()
             table.setHeading('شماره', 'نام')
             for (let i = 0; i < user.blocked.length; i++) {
-                table.addRow(user.blocked[i].telegram_id, user.blocked[i].name)
+                table.addRow(user.blocked[i].id, user.blocked[i].name)
             }
             ctx.reply('کسانی که بلاک کردی اینا هستن:\n\n' +
                 '```' + table.toString().replace(/\|/g, 'ا').replace(/\'/g, 'ا') + '```',
@@ -46,7 +45,7 @@ export const block = async (ctx: TelegrafContext, user: User, toBlock: string) =
             )
 
         }).catch((error) => {
-            console.log(error)
+            console.error(error)
             ctx.reply('خطایی رخ داده است')
         })
     }
@@ -63,7 +62,7 @@ export const unblock = async (ctx: TelegrafContext) => {
             user.state = State.UNBLOCKING
             user.save().then((user) => {
                 for (let i = 0; i < user.blocked.length; i++) {
-                    table.addRow(user.blocked[i].telegram_id, user.blocked[i].name)
+                    table.addRow(user.blocked[i].id, user.blocked[i].name)
                 }
                 ctx.reply('شماره فردی که می‌خوای رفع بلاک بشه رو وارد کن:\n\n' +
                     '```' + table.toString().replace(/\|/g, 'ا').replace(/\'/g, 'ا') + '```',
@@ -95,9 +94,18 @@ export const unblockStep2 = async (ctx: TelegrafContext, user: User) => {
             user.save().then(() => {
                 ctx.reply(`'${contact!.name}' رفع بلاک شد`)
             }).catch((error) => {
-                console.log(error)
+                console.error(error)
                 ctx.reply('خطایی رخ داده است')
             })
         }
+    }
+}
+
+export const mylink = async (ctx: TelegrafContext) => {
+    let user = await User.findOne({ telegram_id: String(ctx.from?.id) })
+    if (!user) {
+        ctx.reply('Not allowed')
+    } else {
+        ctx.reply(`https://t.me/whisper2me_bot?start=${user.id}`)
     }
 }

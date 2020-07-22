@@ -11,9 +11,9 @@ export const callback_handler = async (ctx: TelegrafContext) => {
         const data = ctx.update.callback_query!.data
         if (data?.substr(0, 5) == 'reply') {
             const x = data.substr(6, data.length - 1).split('-')
-            reply(ctx, user, x[0], x[1])
+            reply(ctx, user, Number(x[0]), Number(x[1]))
         } else if (data?.substr(0, 5) == 'block') {
-            block(ctx, user, data.substr(6, data.length - 1))
+            block(ctx, user, Number(data.substr(6, data.length - 1)))
         }
     }
 }

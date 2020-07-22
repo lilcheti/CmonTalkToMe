@@ -4,7 +4,7 @@ import { createConnection } from 'typeorm'
 import { TelegrafContext } from 'telegraf/typings/context'
 import { start } from './controllers/start'
 import { message_handler } from './controllers/message_handler'
-import { setName, unblock } from './controllers/user'
+import { setName, unblock, mylink } from './controllers/user'
 import { callback_handler } from './controllers/callback_handler'
 
 const dotenvResult = dotenv.config()
@@ -33,9 +33,7 @@ const initBot = () => {
         ]
     )
 
-    bot.command('/my_link', (ctx: TelegrafContext) => {
-        ctx.reply(`https://t.me/whisper2me_bot?start=${ctx.from?.id}`)
-    })
+    bot.command('/my_link', mylink)
 
     bot.command('/set_name', setName)
 

@@ -1,4 +1,4 @@
-import { Entity, BaseEntity, PrimaryColumn, Column, ManyToMany, JoinTable } from 'typeorm'
+import { Entity, BaseEntity, Column, ManyToMany, JoinTable, PrimaryGeneratedColumn } from 'typeorm'
 
 export enum State {
     IDLE = 'idle',
@@ -10,7 +10,10 @@ export enum State {
 
 @Entity()
 export class User extends BaseEntity {
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn()
+    id: number
+
+    @Column({ unique: true })
     telegram_id: string
 
     @Column({ default: 'ناشناس' })
@@ -20,12 +23,12 @@ export class User extends BaseEntity {
     state: State
 
     //chatId
-    @Column('text', { nullable: true })
-    messagingTo: string | null
+    @Column('int', { nullable: true })
+    messagingTo: number | null
 
     //messageId
-    @Column('text', { nullable: true })
-    replyingTo: string | null
+    @Column('int', { nullable: true })
+    replyingTo: number | null
 
     @ManyToMany(type => User, user => user.blocked)
     @JoinTable()
