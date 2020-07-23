@@ -86,7 +86,7 @@ export const reply = async (ctx: TelegrafContext, user: User, to: string, messag
             user.messagingTo = to
             user.replyingTo = message_id
             user.save().then(() => {
-                ctx.reply(`درحال پاسخ به '${contact!.name}': پاسخ خود را بنویسید`)
+                ctx.reply('درحال پاسخ به 👆: پاسخ خود را بنویسید', { reply_to_message_id: ctx.update?.callback_query?.message?.message_id })
             }).catch((error) => {
                 console.error(error)
                 ctx.reply('خطایی رخ داده است')
