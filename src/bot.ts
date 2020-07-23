@@ -1,7 +1,6 @@
 import * as dotenv from 'dotenv'
 import { Telegraf } from 'telegraf'
 import { createConnection } from 'typeorm'
-import { TelegrafContext } from 'telegraf/typings/context'
 import { start } from './controllers/start'
 import { message_handler } from './controllers/message_handler'
 import { setName, unblock, mylink } from './controllers/user'

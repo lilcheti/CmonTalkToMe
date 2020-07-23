@@ -3,6 +3,7 @@ import { User, State } from '../models/user'
 import { setNameStep2, unblockStep2 } from './user'
 import { sendMessage, replyStep2 } from './messaging'
 import { v4 } from 'uuid'
+import { handleErrors } from '../util'
 
 export const message_handler = async (ctx: TelegrafContext) => {
     const user = await User.findOne({ telegram_id: String(ctx.from?.id) }, { relations: ['blocked', 'blockedBy'] })
@@ -15,7 +16,7 @@ export const message_handler = async (ctx: TelegrafContext) => {
             user.save().then((user) => {
                 switcher(ctx, user)
             }).catch((error) => {
-                console.error(error)
+                handleErrors(ctx, error)
             })
         } else {
             switcher(ctx, user)

@@ -1,6 +1,7 @@
 import { User, State } from '../models/user'
 import { TelegrafContext } from 'telegraf/typings/context'
 import { Markup } from 'telegraf'
+import { handleErrors } from '../util'
 
 export const sendMessage = async (ctx: TelegrafContext, user: User) => {
     let found = false
@@ -46,15 +47,13 @@ export const sendMessage = async (ctx: TelegrafContext, user: User) => {
                 user.save().then((user) => {
                     ctx.reply('پیام شما ارسال شد')
                 }).catch((error) => {
-                    console.error(error)
-                    ctx.reply('خطایی رخ داده است')
+                    handleErrors(ctx, error)
                 })
             }).catch((error) => {
                 if (error == 'typeNotSupported') {
                     ctx.reply('این نوع پیام پشتیبانی نمی‌شود لطفا برای اضافه کردن آن اینجا گزارش کتید\nhttps://gitlab.com/molaeiali/whisper2me-bot')
                 } else {
-                    console.error(error)
-                    ctx.reply('خطایی رخ داده است')
+                    handleErrors(ctx, error)
                 }
             })
         }
@@ -69,8 +68,7 @@ export const reply = async (ctx: TelegrafContext, user: User, to: string, messag
         contact = await User.findOne(Number(to))
     }
     if (!contact) {
-        console.error('!contact')
-        ctx.reply('خطایی رخ داده است')
+        handleErrors(ctx, '!contact')
     } else {
         let found = false
         for (let i = 0; i < user.blockedBy.length; i++) {
@@ -88,8 +86,7 @@ export const reply = async (ctx: TelegrafContext, user: User, to: string, messag
             user.save().then(() => {
                 ctx.reply('درحال پاسخ به 👆: پاسخ خود را بنویسید', { reply_to_message_id: ctx.update?.callback_query?.message?.message_id })
             }).catch((error) => {
-                console.error(error)
-                ctx.reply('خطایی رخ داده است')
+                handleErrors(ctx, error)
             })
         }
     }
@@ -131,15 +128,13 @@ export const replyStep2 = async (ctx: TelegrafContext, user: User) => {
             user.save().then(() => {
                 ctx.reply('پیام شما ارسال شد')
             }).catch((error) => {
-                console.error(error)
-                ctx.reply('خطایی رخ داده است')
+                handleErrors(ctx, error)
             })
         }).catch((error) => {
             if (error == 'typeNotSupported') {
                 ctx.reply('این نوع پیام پشتیبانی نمی‌شود لطفا برای اضافه کردن آن اینجا گزارش کتید\nhttps://gitlab.com/molaeiali/whisper2me-bot')
             } else {
-                console.error(error)
-                ctx.reply('خطایی رخ داده است')
+                handleErrors(ctx, error)
             }
         })
     }

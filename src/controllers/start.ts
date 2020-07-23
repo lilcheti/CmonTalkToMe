@@ -1,5 +1,6 @@
 import { User, State } from '../models/user'
 import { TC } from '../telegraf'
+import { handleErrors } from '../util'
 
 const greeting =
     'به Whisper2Me خوش اومدی\n' +
@@ -16,8 +17,7 @@ export const start = async (ctx: TC) => {
         user.save().then((user) => {
             payload(ctx, user)
         }).catch((error) => {
-            console.error(error)
-            ctx.reply('خطایی رخ داده است')
+            handleErrors(ctx, error)
         })
     } else {
         payload(ctx, user)
@@ -40,8 +40,7 @@ export const payload = async (ctx: TC, user: User) => {
             user.save().then(() => {
                 ctx.reply(greeting + '\n\n' + `شما از طریق لینک '${contact!.name}' وارد شده‌اید، پیامت به '${contact!.name}' رو بنویس`)
             }).catch((error) => {
-                console.error(error)
-                ctx.reply('خطایی رخ داده است')
+                handleErrors(ctx, error)
             })
         }
     }

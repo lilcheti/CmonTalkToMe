@@ -1,5 +1,6 @@
 import { User, State } from '../models/user'
 import { TelegrafContext } from 'telegraf/typings/context'
+import { handleErrors } from '../util'
 
 export const setName = async (ctx: TelegrafContext) => {
     let user = await User.findOne({ telegram_id: String(ctx.from?.id) })
@@ -10,8 +11,7 @@ export const setName = async (ctx: TelegrafContext) => {
         user.save().then(() => {
             ctx.reply('نام مورد نظر را وارد کنید')
         }).catch((error) => {
-            console.error(error)
-            ctx.reply('خطایی رخ داده است')
+            handleErrors(ctx, error)
         })
     }
 }
@@ -21,8 +21,7 @@ export const setNameStep2 = async (ctx: TelegrafContext, user: User) => {
     user.save().then((user) => {
         ctx.reply(`نام شما ثبت شد: ${user.name}`)
     }).catch((error) => {
-        console.error(error)
-        ctx.reply('خطایی رخ داده است')
+        handleErrors(ctx, error)
     })
 }
 
@@ -54,8 +53,7 @@ export const block = async (ctx: TelegrafContext, user: User, toBlock: string) =
             )
 
         }).catch((error) => {
-            console.error(error)
-            ctx.reply('خطایی رخ داده است')
+            handleErrors(ctx, error)
         })
     }
 }
@@ -113,8 +111,7 @@ export const unblockStep2 = async (ctx: TelegrafContext, user: User) => {
             user.save().then(() => {
                 ctx.reply(`'${contact!.name}' رفع بلاک شد`)
             }).catch((error) => {
-                console.error(error)
-                ctx.reply('خطایی رخ داده است')
+                handleErrors(ctx, error)
             })
         }
     }
