@@ -17,17 +17,24 @@ export const sendMessage = async (ctx: TelegrafContext, user: User) => {
         if (!messageingTo) {
             ctx.reply('Not allowed')
         } else {
-            ctx.telegram.sendMessage(
-                messageingTo.telegram_id,
-                'پیام از سمت \'' + user.name + '\'\n' + ctx.message?.text,
-                {
-                    reply_markup: Markup.inlineKeyboard([
-                        [
-                            Markup.callbackButton('Block', `${'block-' + String(user.id)}`),
-                            Markup.callbackButton('Reply', `${'reply-' + String(user.id) + '-' + String(ctx.message?.message_id)}`)
-                        ]
-                    ])
-                }
+            generalSendMessage(
+                ctx,
+                user.replyingTo,
+                user.id,
+                user.name,
+                messageingTo.telegram_id
+                // )    
+                // ctx.telegram.sendMessage(
+                //     messageingTo.telegram_id,
+                //     'پیام از سمت \'' + user.name + '\'\n' + ctx.message?.text,
+                //     {
+                //         reply_markup: Markup.inlineKeyboard([
+                //             [
+                //                 Markup.callbackButton('Block', `${'block-' + String(user.id)}`),
+                //                 Markup.callbackButton('Reply', `${'reply-' + String(user.id) + '-' + String(ctx.message?.message_id)}`)
+                //             ]
+                //         ])
+                //     }
             ).then(() => {
                 user.state = State.IDLE
                 user.messagingTo = null
@@ -38,8 +45,12 @@ export const sendMessage = async (ctx: TelegrafContext, user: User) => {
                     ctx.reply('خطایی رخ داده است')
                 })
             }).catch((error) => {
-                console.error(error)
-                ctx.reply('خطایی رخ داده است')
+                if (error == 'typeNotSupported') {
+                    ctx.reply('این نوع پیام پشتیبانی نمی‌شود لطفا برای اضافه کردن آن اینجا گزارش کتید\nhttps://gitlab.com/molaeiali/whisper2me-bot')
+                } else {
+                    console.error(error)
+                    ctx.reply('خطایی رخ داده است')
+                }
             })
         }
     }
@@ -79,18 +90,25 @@ export const replyStep2 = async (ctx: TelegrafContext, user: User) => {
     if (!messageingTo) {
         ctx.reply('Not allowed')
     } else {
-        ctx.telegram.sendMessage(
-            messageingTo.telegram_id,
-            'پیام از سمت \'' + user.name + '\'\n' + ctx.message?.text,
-            {
-                reply_to_message_id: user.replyingTo || -1,
-                reply_markup: Markup.inlineKeyboard([
-                    [
-                        Markup.callbackButton('Block', `${'block-' + String(user.id)}`),
-                        Markup.callbackButton('Reply', `${'reply-' + String(user.id) + '-' + String(ctx.message?.message_id)}`)
-                    ]
-                ])
-            }
+        generalSendMessage(
+            ctx,
+            user.replyingTo,
+            user.id,
+            user.name || 'ناشناس',
+            messageingTo.telegram_id
+            // )
+            // ctx.telegram.sendMessage(
+            //     messageingTo.telegram_id,
+            //     'پیام از سمت \'' + user.name + '\'\n' + ctx.message?.text,
+            //     {
+            //         reply_to_message_id: user.replyingTo || -1,
+            //         reply_markup: Markup.inlineKeyboard([
+            //             [
+            //                 Markup.callbackButton('Block', `${'block-' + String(user.id)}`),
+            //                 Markup.callbackButton('Reply', `${'reply-' + String(user.id) + '-' + String(ctx.message?.message_id)}`)
+            //             ]
+            //         ])
+            //     }
         ).then(() => {
             user.state = State.IDLE
             user.replyingTo = null
@@ -102,8 +120,58 @@ export const replyStep2 = async (ctx: TelegrafContext, user: User) => {
                 ctx.reply('خطایی رخ داده است')
             })
         }).catch((error) => {
-            console.error(error)
-            ctx.reply('خطایی رخ داده است')
+            if (error == 'typeNotSupported') {
+                ctx.reply('این نوع پیام پشتیبانی نمی‌شود لطفا برای اضافه کردن آن اینجا گزارش کتید\nhttps://gitlab.com/molaeiali/whisper2me-bot')
+            } else {
+                console.error(error)
+                ctx.reply('خطایی رخ داده است')
+            }
         })
+    }
+}
+
+const generalSendMessage = (ctx: TelegrafContext, replyingTo: number | null, id: number, name: string, chatId: string) => {
+    const extra = {
+        caption: `پیام از سمت '${name}'${ctx.message?.caption ? ': ' + ctx.message?.caption : ''}`,
+        reply_to_message_id: replyingTo || undefined,
+        reply_markup: Markup.inlineKeyboard([
+            [
+                Markup.callbackButton('Block', `${'block-' + String(id)}`),
+                Markup.callbackButton('Reply', `${'reply-' + String(id) + '-' + String(ctx.message?.message_id)}`)
+            ]
+        ])
+    }
+    const extraWithOutCaption = {
+        reply_to_message_id: replyingTo || undefined,
+        reply_markup: Markup.inlineKeyboard([
+            [
+                Markup.callbackButton('Block', `${'block-' + String(id)}`),
+                Markup.callbackButton('Reply', `${'reply-' + String(id) + '-' + String(ctx.message?.message_id)}`)
+            ]
+        ])
+    }
+    if (ctx.message?.document) {
+        return ctx.telegram.sendDocument(chatId, ctx.message?.document.file_id, extra)
+    } else if (ctx.message?.video) {
+        return ctx.telegram.sendVoice(chatId, ctx.message?.video.file_id, extra)
+    } else if (ctx.message?.photo) {
+        return ctx.telegram.sendPhoto(chatId, ctx.message?.photo[0].file_id, extra)
+    } else if (ctx.message?.voice) {
+        return ctx.telegram.sendVoice(chatId, ctx.message?.voice.file_id, extra)
+    } else if (ctx.message?.sticker) {
+        ctx.telegram.sendMessage(chatId, `پیام از سمت '${name}':`).then(() => {
+
+        }).catch((error) => {
+            console.error(error)
+        })
+        return ctx.telegram.sendSticker(chatId, ctx.message?.sticker!.file_id!, extraWithOutCaption)
+    } else if (ctx.message?.audio) {
+        return ctx.telegram.sendAudio(chatId, ctx.message?.audio.file_id, extra)
+    } else if (ctx.message?.animation) {
+        return ctx.telegram.sendAnimation(chatId, ctx.message?.animation.file_id, extra)
+    } else if (ctx.message?.text) {
+        return ctx.telegram.sendMessage(chatId, `پیام از سمت '${name}': ${ctx.message?.text}`, extraWithOutCaption)
+    } else {
+        return Promise.reject('typeNotSupported')
     }
 }

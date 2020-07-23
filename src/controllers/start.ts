@@ -13,19 +13,18 @@ export const start = async (ctx: TC) => {
     if (!user) {
         user = new User()
         user.telegram_id = String(ctx.from?.id)
-        user.save().then(() => {
-            payload(ctx)
+        user.save().then((user) => {
+            payload(ctx, user)
         }).catch((error) => {
             console.error(error)
             ctx.reply('خطایی رخ داده است')
         })
     } else {
-        payload(ctx)
+        payload(ctx, user)
     }
 }
 
-export const payload = async (ctx: TC) => {
-    let user = await User.findOne({ telegram_id: String(ctx.from?.id) })
+export const payload = async (ctx: TC, user: User) => {
     if (!user) {
         ctx.reply('Not allowed')
     } else {
