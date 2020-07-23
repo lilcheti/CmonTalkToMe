@@ -5,7 +5,7 @@ import { Markup } from 'telegraf'
 export const sendMessage = async (ctx: TelegrafContext, user: User) => {
     let found = false
     for (let i = 0; i < user.blockedBy.length; i++) {
-        if (user.blockedBy[i].id == user.messagingTo) {
+        if (user.blockedBy[i].uid == user.messagingTo) {
             found = true
             break
         }
@@ -13,14 +13,19 @@ export const sendMessage = async (ctx: TelegrafContext, user: User) => {
     if (found) {
         ctx.reply('شما نمی‌توانید به این کاربر پیام بدهید')
     } else {
-        const messageingTo = await User.findOne(user.messagingTo || -1)
+        // New method to use uuid
+        let messageingTo = await User.findOne({ uid: user.messagingTo || '' })
+        if (!messageingTo) {
+            //TODO:  Old deprecated id based method
+            messageingTo = await User.findOne({ id: Number(user.messagingTo) })
+        }
         if (!messageingTo) {
             ctx.reply('Not allowed')
         } else {
             generalSendMessage(
                 ctx,
                 user.replyingTo,
-                user.id,
+                user.uid || '',
                 user.name,
                 messageingTo.telegram_id
                 // )    
@@ -56,8 +61,13 @@ export const sendMessage = async (ctx: TelegrafContext, user: User) => {
     }
 }
 
-export const reply = async (ctx: TelegrafContext, user: User, to: number, message_id: number) => {
-    let contact = await User.findOne(to)
+export const reply = async (ctx: TelegrafContext, user: User, to: string, message_id: number) => {
+    // New method to use uuid
+    let contact = await User.findOne({ uid: to })
+    if (!contact) {
+        //TODO:  Old deprecated id based method
+        contact = await User.findOne(Number(to))
+    }
     if (!contact) {
         console.error('!contact')
         ctx.reply('خطایی رخ داده است')
@@ -86,14 +96,19 @@ export const reply = async (ctx: TelegrafContext, user: User, to: number, messag
 }
 
 export const replyStep2 = async (ctx: TelegrafContext, user: User) => {
-    const messageingTo = await User.findOne(user.messagingTo || -1)
+    // New method to use uuid
+    let messageingTo = await User.findOne({ uid: user.messagingTo || '' })
+    if (!messageingTo) {
+        //TODO:  Old deprecated id based method
+        messageingTo = await User.findOne({ id: Number(user.messagingTo) })
+    }
     if (!messageingTo) {
         ctx.reply('Not allowed')
     } else {
         generalSendMessage(
             ctx,
             user.replyingTo,
-            user.id,
+            user.uid || '',
             user.name || 'ناشناس',
             messageingTo.telegram_id
             // )
@@ -130,7 +145,7 @@ export const replyStep2 = async (ctx: TelegrafContext, user: User) => {
     }
 }
 
-const generalSendMessage = (ctx: TelegrafContext, replyingTo: number | null, id: number, name: string, chatId: string) => {
+const generalSendMessage = (ctx: TelegrafContext, replyingTo: number | null, id: string, name: string, chatId: string) => {
     const extra = {
         caption: `پیام از سمت '${name}'${ctx.message?.caption ? ': ' + ctx.message?.caption : ''}`,
         reply_to_message_id: replyingTo || undefined,

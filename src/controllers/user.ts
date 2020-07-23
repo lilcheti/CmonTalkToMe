@@ -1,6 +1,5 @@
 import { User, State } from '../models/user'
 import { TelegrafContext } from 'telegraf/typings/context'
-import * as AsciiTable from 'ascii-table'
 
 export const setName = async (ctx: TelegrafContext) => {
     let user = await User.findOne({ telegram_id: String(ctx.from?.id) })
@@ -27,20 +26,30 @@ export const setNameStep2 = async (ctx: TelegrafContext, user: User) => {
     })
 }
 
-export const block = async (ctx: TelegrafContext, user: User, toBlock: number) => {
-    let contact = await User.findOne(toBlock, { relations: ['blocked'] })
+export const block = async (ctx: TelegrafContext, user: User, toBlock: string) => {
+    // New method to use uuid
+    let contact = await User.findOne({ uid: toBlock }, { relations: ['blocked'] })
+    if (!contact) {
+        //TODO:  Old deprecated id based method
+        contact = await User.findOne(Number(toBlock), { relations: ['blocked'] })
+    }
     if (!contact) {
         ctx.reply('Not allowed')
     } else {
         user.blocked.push(contact)
         user.save().then((user) => {
-            const table = new AsciiTable()
-            table.setHeading('شماره', 'نام')
+            let message = 'نام    \\-    کد' + '\n'
             for (let i = 0; i < user.blocked.length; i++) {
-                table.addRow(user.blocked[i].id, user.blocked[i].name)
+                if (user.blocked[i].uid) {
+                    // New method to use uuid
+                    message += '```' + user.blocked[i].uid?.replace(/-/g, '\\-') + '```' + ' \\- ' + user.blocked[i].name + '\n'
+                } else {
+                    //TODO: Old deprecated id based method
+                    message += '```' + user.blocked[i].id + '```' + ' \\- ' + user.blocked[i].name + '\n'
+                }
             }
             ctx.reply('کسانی که بلاک کردی اینا هستن:\n\n' +
-                '```' + table.toString().replace(/\|/g, 'ا').replace(/\'/g, 'ا') + '```',
+                message,
                 { parse_mode: 'MarkdownV2' }
             )
 
@@ -57,15 +66,20 @@ export const unblock = async (ctx: TelegrafContext) => {
         ctx.reply('Not allowed')
     } else {
         if (user.blocked.length > 0) {
-            const table = new AsciiTable()
-            table.setHeading('شماره', 'نام')
+            let message = 'نام    \\-    کد' + '\n'
             user.state = State.UNBLOCKING
             user.save().then((user) => {
                 for (let i = 0; i < user.blocked.length; i++) {
-                    table.addRow(user.blocked[i].id, user.blocked[i].name)
+                    if (user.blocked[i].uid) {
+                        // New method to use uuid
+                        message += '```' + user.blocked[i].uid?.replace(/-/g, '\\-') + '```' + ' \\- ' + user.blocked[i].name + '\n'
+                    } else {
+                        //TODO:  Old deprecated id based method
+                        message += '```' + user.blocked[i].id + '```' + ' \\- ' + user.blocked[i].name + '\n'
+                    }
                 }
-                ctx.reply('شماره فردی که می‌خوای رفع بلاک بشه رو وارد کن:\n\n' +
-                    '```' + table.toString().replace(/\|/g, 'ا').replace(/\'/g, 'ا') + '```',
+                ctx.reply('کد فردی که می‌خوای رفع بلاک بشه رو وارد کن:\n\n' +
+                    message,
                     { parse_mode: 'MarkdownV2' }
                 )
             })
@@ -76,9 +90,14 @@ export const unblock = async (ctx: TelegrafContext) => {
 }
 
 export const unblockStep2 = async (ctx: TelegrafContext, user: User) => {
-    let contact = await User.findOne(ctx.message?.text?.trim())
+    // New method to use uuid
+    let contact = await User.findOne({ uid: ctx.message?.text?.trim() })
     if (!contact) {
-        ctx.reply('شما این کاربر را بلاک نکرده‌اید یا شماره نامعتبر می‌باشد')
+        //TODO:  Old deprecated id based method
+        contact = await User.findOne(Number(ctx.message?.text?.trim()))
+    }
+    if (!contact) {
+        ctx.reply('شما این کاربر را بلاک نکرده‌اید یا کد نامعتبر می‌باشد')
     } else {
         let blocked = []
         for (let i = 0; i < user.blocked.length; i++) {

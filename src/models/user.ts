@@ -1,4 +1,5 @@
 import { Entity, BaseEntity, Column, ManyToMany, JoinTable, PrimaryGeneratedColumn } from 'typeorm'
+import { v4 } from 'uuid'
 
 export enum State {
     IDLE = 'idle',
@@ -16,6 +17,9 @@ export class User extends BaseEntity {
     @Column({ unique: true })
     telegram_id: string
 
+    @Column('text', { default: null })
+    uid: string | null
+
     @Column({ default: 'ناشناس' })
     name: string
 
@@ -24,7 +28,7 @@ export class User extends BaseEntity {
 
     //chatId
     @Column('int', { nullable: true })
-    messagingTo: number | null
+    messagingTo: string | null
 
     //messageId
     @Column('int', { nullable: true })
