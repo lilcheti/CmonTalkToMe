@@ -1,6 +1,6 @@
 import { TelegrafContext } from 'telegraf/typings/context'
 import { User, State } from '../models/user'
-import { setNameStep2, unblockStep2 } from './user'
+import { setNameStep2 } from './user'
 import { sendMessage, replyStep2 } from './messaging'
 import { v4 } from 'uuid'
 import { handleErrors } from '../util'
@@ -38,9 +38,9 @@ const switcher = async (ctx: TelegrafContext, user: User) => {
             await replyStep2(ctx, user)
             break
         }
-        case State.UNBLOCKING: {
-            await unblockStep2(ctx, user)
-            break
-        }
+        // case State.UNBLOCKING: {
+        //     await unblockStep2(ctx, user)
+        //     break
+        // }
     }
 }

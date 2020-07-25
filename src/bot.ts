@@ -27,8 +27,8 @@ const initBot = () => {
     bot.telegram.setMyCommands(
         [
             { command: 'my_link', description: 'برای گرفتن لینک خودت' },
-            { command: 'set_name', description: 'برای تغییر نام خودت' },
-            { command: 'unblock', description: 'برای رفع بلاک' },
+            { command: 'set_name', description: 'برای تغییر نام خودت (ناشناس به صورت پیشفرض)' },
+            { command: 'unblock', description: 'برای رفع بلاک همه کاربران' },
         ]
     )
 

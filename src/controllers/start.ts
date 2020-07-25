@@ -5,8 +5,8 @@ import { handleErrors } from '../util'
 const greeting =
     'به Whisper2Me خوش اومدی\n' +
     'برای گرفتن لینک خودت /my_link رو بفرست\n' +
-    'برای تغییر نام خودت /set_name رو بفرست\n' +
-    'برای  رفع بلاک /unblock رو بفرست\n'
+    'برای تغییر نام خودت /set_name رو بفرست (ناشناس به صورت پیشفرض)\n' +
+    'برای  رفع بلاک همه کاربران /unblock رو بفرست\n'
 
 
 export const start = async (ctx: TC) => {
