@@ -1,6 +1,7 @@
 import { User, State } from '../models/user'
 import { TC } from '../telegraf'
 import { handleErrors } from '../util'
+import { v4 } from 'uuid'
 
 const greeting =
     'به Whisper2Me خوش اومدی\n' +
@@ -14,6 +15,7 @@ export const start = async (ctx: TC) => {
     if (!user) {
         user = new User()
         user.telegram_id = String(ctx.from?.id)
+        user.uid = v4()
         user.save().then((user) => {
             payload(ctx, user)
         }).catch((error) => {
