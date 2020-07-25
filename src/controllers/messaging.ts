@@ -142,7 +142,7 @@ export const replyStep2 = async (ctx: TelegrafContext, user: User) => {
 
 const generalSendMessage = (ctx: TelegrafContext, replyingTo: number | null, id: string, name: string, chatId: string) => {
     const extra = {
-        caption: `پیام از سمت '${name}'${ctx.message?.caption ? ': ' + ctx.message?.caption : ''}`,
+        caption: `پیام جدید ${ctx.message?.caption ? ': ' + ctx.message?.caption : ''}`,
         reply_to_message_id: replyingTo || undefined,
         reply_markup: Markup.inlineKeyboard([
             [
@@ -169,7 +169,7 @@ const generalSendMessage = (ctx: TelegrafContext, replyingTo: number | null, id:
     } else if (ctx.message?.voice) {
         return ctx.telegram.sendVoice(chatId, ctx.message?.voice.file_id, extra)
     } else if (ctx.message?.sticker) {
-        ctx.telegram.sendMessage(chatId, `پیام از سمت '${name}':`).then(() => {
+        ctx.telegram.sendMessage(chatId, 'پیام جدید').then(() => {
 
         }).catch((error) => {
             console.error(error)
@@ -180,7 +180,7 @@ const generalSendMessage = (ctx: TelegrafContext, replyingTo: number | null, id:
     } else if (ctx.message?.animation) {
         return ctx.telegram.sendAnimation(chatId, ctx.message?.animation.file_id, extra)
     } else if (ctx.message?.text) {
-        return ctx.telegram.sendMessage(chatId, `پیام از سمت '${name}': ${ctx.message?.text}`, extraWithOutCaption)
+        return ctx.telegram.sendMessage(chatId, `پیام جدید: ${ctx.message?.text}`, extraWithOutCaption)
     } else {
         return Promise.reject('typeNotSupported')
     }
