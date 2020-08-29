@@ -18,6 +18,7 @@ export const setName = async (ctx: TelegrafContext) => {
 
 export const setNameStep2 = async (ctx: TelegrafContext, user: User) => {
     user.name = ctx.message!.text || 'ناشناس'
+    user.state = State.IDLE
     user.save().then((user) => {
         ctx.reply(`نام شما ثبت شد: ${user.name}`)
     }).catch((error) => {
