@@ -5,6 +5,7 @@ import { start } from './controllers/start'
 import { message_handler } from './controllers/message_handler'
 import { setName, unblock, mylink } from './controllers/user'
 import { callback_handler } from './controllers/callback_handler'
+import { faq } from './controllers/general'
 
 const dotenvResult = dotenv.config()
 if (dotenvResult.error) {
@@ -29,6 +30,7 @@ const initBot = () => {
             { command: 'my_link', description: 'برای گرفتن لینک خودت' },
             { command: 'set_name', description: 'برای تغییر نام خودت (ناشناس به صورت پیشفرض)' },
             { command: 'unblock', description: 'برای رفع بلاک همه کاربران' },
+            { command: 'faq', description: 'سوالات متداول' },
         ]
     )
 
@@ -37,6 +39,8 @@ const initBot = () => {
     bot.command('/set_name', setName)
 
     bot.command('/unblock', unblock)
+
+    bot.command('/faq', faq)
 
     bot.on('callback_query', callback_handler)
     bot.on('message', message_handler)
