@@ -40,6 +40,7 @@ export const payload = async (ctx: TC, user: User) => {
         } else {
             user.state = State.MESSAGING
             user.messagingTo = contact.uid ? contact.uid : String(contact.id)
+            user.replyingTo = null
             user.save().then(() => {
                 ctx.reply(greeting + '\n\n' + `شما از طریق لینک '${contact!.name}' وارد شده‌اید، پیامت به '${contact!.name}' رو بنویس`)
             }).catch((error) => {
