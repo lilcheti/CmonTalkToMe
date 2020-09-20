@@ -28,7 +28,8 @@ export const sendMessage = async (ctx: TelegrafContext, user: User) => {
                 user.replyingTo,
                 user.uid || '',
                 user.name,
-                messageingTo.telegram_id
+                messageingTo.telegram_id,
+                messageingTo.id == user.id
                 // )    
                 // ctx.telegram.sendMessage(
                 //     messageingTo.telegram_id,
@@ -107,7 +108,8 @@ export const replyStep2 = async (ctx: TelegrafContext, user: User) => {
             user.replyingTo,
             user.uid || '',
             user.name || 'ناشناس',
-            messageingTo.telegram_id
+            messageingTo.telegram_id,
+            messageingTo.id == user.id
             // )
             // ctx.telegram.sendMessage(
             //     messageingTo.telegram_id,
@@ -140,9 +142,9 @@ export const replyStep2 = async (ctx: TelegrafContext, user: User) => {
     }
 }
 
-const generalSendMessage = (ctx: TelegrafContext, replyingTo: number | null, id: string, name: string, chatId: string) => {
+const generalSendMessage = (ctx: TelegrafContext, replyingTo: number | null, id: string, name: string, chatId: string, selfMessage: boolean) => {
     const extra = {
-        caption: `پیام جدید ${ctx.message?.caption ? ': ' + ctx.message?.caption : ''}`,
+        caption: `${selfMessage ? '' : 'پیام جدید '}${ctx.message?.caption ? ': ' + ctx.message?.caption : ''}`,
         reply_to_message_id: replyingTo || undefined,
         reply_markup: Markup.inlineKeyboard([
             [
@@ -180,7 +182,7 @@ const generalSendMessage = (ctx: TelegrafContext, replyingTo: number | null, id:
     } else if (ctx.message?.animation) {
         return ctx.telegram.sendAnimation(chatId, ctx.message?.animation.file_id, extra)
     } else if (ctx.message?.text) {
-        return ctx.telegram.sendMessage(chatId, `پیام جدید: ${ctx.message?.text}`, extraWithOutCaption)
+        return ctx.telegram.sendMessage(chatId, `${selfMessage ? '' : 'پیام جدید: '}${ctx.message?.text}`, extraWithOutCaption)
     } else {
         return Promise.reject('typeNotSupported')
     }
