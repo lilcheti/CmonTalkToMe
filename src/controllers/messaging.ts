@@ -165,7 +165,7 @@ const generalSendMessage = (ctx: TelegrafContext, replyingTo: number | null, id:
     if (ctx.message?.document) {
         return ctx.telegram.sendDocument(chatId, ctx.message?.document.file_id, extra)
     } else if (ctx.message?.video) {
-        return ctx.telegram.sendVoice(chatId, ctx.message?.video.file_id, extra)
+        return ctx.telegram.sendVideo(chatId, ctx.message?.video.file_id, extra)
     } else if (ctx.message?.photo) {
         return ctx.telegram.sendPhoto(chatId, ctx.message?.photo[0].file_id, extra)
     } else if (ctx.message?.voice) {
