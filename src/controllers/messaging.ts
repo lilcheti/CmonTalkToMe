@@ -135,6 +135,9 @@ export const replyStep2 = async (ctx: TelegrafContext, user: User) => {
         }).catch((error) => {
             if (error == 'typeNotSupported') {
                 ctx.reply('این نوع پیام پشتیبانی نمی‌شود لطفا برای اضافه کردن آن اینجا گزارش کتید\nhttps://gitlab.com/molaeiali/whisper2me-bot')
+            } else if (error.code && error.code == 400 && error.description && error.description == 'Bad Request: reply message not found') {
+                user.replyingTo = null
+                replyStep2(ctx, user)
             } else {
                 handleErrors(ctx, error)
             }
