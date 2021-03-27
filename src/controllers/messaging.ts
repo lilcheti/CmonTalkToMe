@@ -4,14 +4,14 @@ import { Markup } from 'telegraf'
 import { handleErrors } from '../util'
 
 export const sendMessage = async (ctx: TelegrafContext, user: User) => {
-    let found = false
+    let userIsBlocked = false
     for (let i = 0; i < user.blockedBy.length; i++) {
         if (user.blockedBy[i].uid == user.messagingTo) {
-            found = true
+            userIsBlocked = true
             break
         }
     }
-    if (found) {
+    if (userIsBlocked) {
         ctx.reply('شما نمی‌توانید به این کاربر پیام بدهید')
     } else {
         // New method to use uuid
@@ -52,7 +52,7 @@ export const sendMessage = async (ctx: TelegrafContext, user: User) => {
                 })
             }).catch((error) => {
                 if (error == 'typeNotSupported') {
-                    ctx.reply('این نوع پیام پشتیبانی نمی‌شود لطفا برای اضافه کردن آن اینجا گزارش کتید\nhttps://gitlab.com/molaeiali/whisper2me-bot')
+                    ctx.reply('این نوع پیام پشتیبانی نمی‌شود لطفا برای اضافه کردن آن اینجا گزارش کنید\nhttps://gitlab.com/molaeiali/whisper2me-bot')
                 } else {
                     handleErrors(ctx, error)
                 }
@@ -71,14 +71,14 @@ export const reply = async (ctx: TelegrafContext, user: User, to: string, messag
     if (!contact) {
         handleErrors(ctx, '!contact')
     } else {
-        let found = false
+        let userIsBlocked = false
         for (let i = 0; i < user.blockedBy.length; i++) {
             if (user.blockedBy[i].id == contact.id) {
-                found = true
+                userIsBlocked = true
                 break
             }
         }
-        if (found) {
+        if (userIsBlocked) {
             ctx.reply('شما نمی‌توانید به این کاربر پیام بدهید')
         } else {
             user.state = State.REPLY
@@ -134,7 +134,7 @@ export const replyStep2 = async (ctx: TelegrafContext, user: User) => {
             })
         }).catch((error) => {
             if (error == 'typeNotSupported') {
-                ctx.reply('این نوع پیام پشتیبانی نمی‌شود لطفا برای اضافه کردن آن اینجا گزارش کتید\nhttps://gitlab.com/molaeiali/whisper2me-bot')
+                ctx.reply('این نوع پیام پشتیبانی نمی‌شود لطفا برای اضافه کردن آن اینجا گزارش کkید\nhttps://gitlab.com/molaeiali/whisper2me-bot')
             } else if (error.code && error.code == 400 && error.description && error.description == 'Bad Request: reply message not found') {
                 user.replyingTo = null
                 replyStep2(ctx, user)
@@ -147,7 +147,7 @@ export const replyStep2 = async (ctx: TelegrafContext, user: User) => {
 
 const generalSendMessage = (ctx: TelegrafContext, replyingTo: number | null, id: string, name: string, chatId: string, selfMessage: boolean) => {
     const extra = {
-        caption: `${selfMessage ? '' : 'پیام جدید '}${ctx.message?.caption ? ': ' + ctx.message?.caption : ''}`,
+        caption: `${selfMessage ? '' : 'پیام جدید'}${ctx.message?.caption ? ': ' + ctx.message?.caption : ''}`,
         reply_to_message_id: replyingTo || undefined,
         reply_markup: Markup.inlineKeyboard([
             [
