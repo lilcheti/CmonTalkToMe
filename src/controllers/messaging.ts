@@ -4,14 +4,14 @@ import { Markup } from 'telegraf'
 import { handleErrors } from '../util'
 
 export const sendMessage = async (ctx: TelegrafContext, user: User) => {
-    let found = false
+    let userIsBlocked = false
     for (let i = 0; i < user.blockedBy.length; i++) {
         if (user.blockedBy[i].uid == user.messagingTo) {
-            found = true
+            userIsBlocked = true
             break
         }
     }
-    if (found) {
+    if (userIsBlocked) {
         ctx.reply('شما نمی‌توانید به این کاربر پیام بدهید')
     } else {
         // New method to use uuid
@@ -71,14 +71,14 @@ export const reply = async (ctx: TelegrafContext, user: User, to: string, messag
     if (!contact) {
         handleErrors(ctx, '!contact')
     } else {
-        let found = false
+        let userIsBlocked = false
         for (let i = 0; i < user.blockedBy.length; i++) {
             if (user.blockedBy[i].id == contact.id) {
-                found = true
+                userIsBlocked = true
                 break
             }
         }
-        if (found) {
+        if (userIsBlocked) {
             ctx.reply('شما نمی‌توانید به این کاربر پیام بدهید')
         } else {
             user.state = State.REPLY
