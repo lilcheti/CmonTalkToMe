@@ -147,7 +147,7 @@ export const replyStep2 = async (ctx: TelegrafContext, user: User) => {
 
 const generalSendMessage = (ctx: TelegrafContext, replyingTo: number | null, id: string, name: string, chatId: string, selfMessage: boolean) => {
     const extra = {
-        caption: `${selfMessage ? '' : 'پیام جدید '}${ctx.message?.caption ? ': ' + ctx.message?.caption : ''}`,
+        caption: `${selfMessage ? '' : 'پیام جدید'}${ctx.message?.caption ? ': ' + ctx.message?.caption : ''}`,
         reply_to_message_id: replyingTo || undefined,
         reply_markup: Markup.inlineKeyboard([
             [
