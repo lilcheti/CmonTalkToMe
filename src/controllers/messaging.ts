@@ -40,18 +40,6 @@ export const sendMessage = async (ctx: TelegrafContext, user: User, random: bool
                 messageingTo.telegram_id,
                 messageingTo.id == user.id,
                 random
-                // )    
-                // ctx.telegram.sendMessage(
-                //     messageingTo.telegram_id,
-                //     'پیام از سمت \'' + user.name + '\'\n' + ctx.message?.text,
-                //     {
-                //         reply_markup: Markup.inlineKeyboard([
-                //             [
-                //                 Markup.callbackButton('Block', `${'block-' + String(user.id)}`),
-                //                 Markup.callbackButton('Reply', `${'reply-' + String(user.id) + '-' + String(ctx.message?.message_id)}`)
-                //             ]
-                //         ])
-                //     }
             ).then(() => {
                 user.state = State.IDLE
                 user.messagingTo = null
@@ -121,19 +109,6 @@ export const replyStep2 = async (ctx: TelegrafContext, user: User) => {
             messageingTo.telegram_id,
             messageingTo.id == user.id,
             false
-            // )
-            // ctx.telegram.sendMessage(
-            //     messageingTo.telegram_id,
-            //     'پیام از سمت \'' + user.name + '\'\n' + ctx.message?.text,
-            //     {
-            //         reply_to_message_id: user.replyingTo || -1,
-            //         reply_markup: Markup.inlineKeyboard([
-            //             [
-            //                 Markup.callbackButton('Block', `${'block-' + String(user.id)}`),
-            //                 Markup.callbackButton('Reply', `${'reply-' + String(user.id) + '-' + String(ctx.message?.message_id)}`)
-            //             ]
-            //         ])
-            //     }
         ).then(() => {
             user.state = State.IDLE
             user.replyingTo = null

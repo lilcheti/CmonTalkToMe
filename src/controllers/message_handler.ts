@@ -42,9 +42,5 @@ const switcher = async (ctx: TelegrafContext, user: User) => {
             await replyStep2(ctx, user)
             break
         }
-        // case State.UNBLOCKING: {
-        //     await unblockStep2(ctx, user)
-        //     break
-        // }
     }
 }
