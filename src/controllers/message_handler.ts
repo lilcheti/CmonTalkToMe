@@ -31,7 +31,11 @@ const switcher = async (ctx: TelegrafContext, user: User) => {
             break
         }
         case State.MESSAGING: {
-            await sendMessage(ctx, user)
+            await sendMessage(ctx, user, false)
+            break
+        }
+        case State.RANDOM: {
+            await sendMessage(ctx, user, true)
             break
         }
         case State.REPLY: {

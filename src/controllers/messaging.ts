@@ -2,23 +2,32 @@ import { User, State } from '../models/user'
 import { TelegrafContext } from 'telegraf/typings/context'
 import { Markup } from 'telegraf'
 import { handleErrors } from '../util'
+import { In, Not } from 'typeorm'
 
-export const sendMessage = async (ctx: TelegrafContext, user: User) => {
+export const sendMessage = async (ctx: TelegrafContext, user: User, random: boolean) => {
     let userIsBlocked = false
-    for (let i = 0; i < user.blockedBy.length; i++) {
-        if (user.blockedBy[i].uid == user.messagingTo) {
-            userIsBlocked = true
-            break
+    if (!random) {
+        for (let i = 0; i < user.blockedBy.length; i++) {
+            if (user.blockedBy[i].uid == user.messagingTo) {
+                userIsBlocked = true
+                break
+            }
         }
     }
     if (userIsBlocked) {
         ctx.reply('شما نمی‌توانید به این کاربر پیام بدهید')
     } else {
-        // New method to use uuid
-        let messageingTo = await User.findOne({ uid: user.messagingTo || '' })
-        if (!messageingTo) {
-            //TODO:  Old deprecated id based method
-            messageingTo = await User.findOne({ id: Number(user.messagingTo) })
+        let messageingTo = undefined
+        if (!random) {
+            // New method to use uuid
+            messageingTo = await User.findOne({ uid: user.messagingTo || '' })
+            if (!messageingTo) {
+                //TODO:  Old deprecated id based method
+                messageingTo = await User.findOne({ id: Number(user.messagingTo) })
+            }
+        } else {
+            let users = await User.find({ uid: Not(In(user.blockedBy.map(u => u.uid))) })
+            messageingTo = users[Math.floor(Math.random() * users.length)]
         }
         if (!messageingTo) {
             ctx.reply('Not allowed')
@@ -29,7 +38,8 @@ export const sendMessage = async (ctx: TelegrafContext, user: User) => {
                 user.uid || '',
                 user.name,
                 messageingTo.telegram_id,
-                messageingTo.id == user.id
+                messageingTo.id == user.id,
+                random
                 // )    
                 // ctx.telegram.sendMessage(
                 //     messageingTo.telegram_id,
@@ -109,7 +119,8 @@ export const replyStep2 = async (ctx: TelegrafContext, user: User) => {
             user.uid || '',
             user.name || 'ناشناس',
             messageingTo.telegram_id,
-            messageingTo.id == user.id
+            messageingTo.id == user.id,
+            false
             // )
             // ctx.telegram.sendMessage(
             //     messageingTo.telegram_id,
@@ -145,9 +156,10 @@ export const replyStep2 = async (ctx: TelegrafContext, user: User) => {
     }
 }
 
-const generalSendMessage = (ctx: TelegrafContext, replyingTo: number | null, id: string, name: string, chatId: string, selfMessage: boolean) => {
+const generalSendMessage = (ctx: TelegrafContext, replyingTo: number | null, id: string, name: string, chatId: string, selfMessage: boolean, random: boolean) => {
+    const newMessageText = random ? 'پیام تصادفی جدید' : 'پیام جدید'
     const extra = {
-        caption: `${selfMessage ? '' : 'پیام جدید'}${(!selfMessage && ctx.message?.caption) ? ': ' + ctx.message?.caption : ''}`,
+        caption: `${selfMessage ? '' : newMessageText}${(!selfMessage && ctx.message?.caption) ? ': ' + ctx.message?.caption : ''}`,
         reply_to_message_id: replyingTo || undefined,
         reply_markup: Markup.inlineKeyboard([
             [
@@ -174,7 +186,7 @@ const generalSendMessage = (ctx: TelegrafContext, replyingTo: number | null, id:
     } else if (ctx.message?.voice) {
         return ctx.telegram.sendVoice(chatId, ctx.message?.voice.file_id, extra)
     } else if (ctx.message?.sticker) {
-        ctx.telegram.sendMessage(chatId, 'پیام جدید').then(() => {
+        ctx.telegram.sendMessage(chatId, newMessageText).then(() => {
 
         }).catch((error) => {
             console.error(error)
@@ -185,7 +197,7 @@ const generalSendMessage = (ctx: TelegrafContext, replyingTo: number | null, id:
     } else if (ctx.message?.animation) {
         return ctx.telegram.sendAnimation(chatId, ctx.message?.animation.file_id, extra)
     } else if (ctx.message?.text) {
-        return ctx.telegram.sendMessage(chatId, `${selfMessage ? '' : 'پیام جدید: '}${ctx.message?.text}`, extraWithOutCaption)
+        return ctx.telegram.sendMessage(chatId, `${selfMessage ? '' : newMessageText + ': '}${ctx.message?.text}`, extraWithOutCaption)
     } else {
         return Promise.reject('typeNotSupported')
     }

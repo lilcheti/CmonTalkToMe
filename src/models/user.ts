@@ -1,12 +1,12 @@
 import { Entity, BaseEntity, Column, ManyToMany, JoinTable, PrimaryGeneratedColumn } from 'typeorm'
-import { v4 } from 'uuid'
 
 export enum State {
     IDLE = 'idle',
     MESSAGING = 'messaging',
     SET_NAME = 'set-name',
     REPLY = 'reply',
-    UNBLOCKING = 'unblocking'
+    UNBLOCKING = 'unblocking',
+    RANDOM = 'random',
 }
 
 @Entity()
