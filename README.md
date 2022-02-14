@@ -1,8 +1,8 @@
-# Whisper2MeBot | ربات با من پچ‌پچ کن
+# CumonTalktoMeBotBot | ربات با من پچ‌پچ کن
 این یه ربات چت ناشناس تلگرامه که هیچ پیامی رو 
 ذخیره نمی‌کنه و متن‌بازه
 
-- [Wishper2Me](https://t.me/whisper2me_bot)
+- [Wishper2Me](https://t.me/CumonTalktoMeBot)
 
 ## قدم‌های بعدی
  - [x] اضافه کردن قابلیت بلاک

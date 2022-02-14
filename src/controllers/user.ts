@@ -80,6 +80,6 @@ export const mylink = async (ctx: TelegrafContext) => {
     if (!user) {
         ctx.reply('Not allowed')
     } else {
-        ctx.reply(`https://t.me/whisper2me_bot?start=${user.id}`)
+        ctx.reply(`https://t.me/CumonTalktoMeBot?start=${user.id}`)
     }
 }

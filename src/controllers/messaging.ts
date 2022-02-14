@@ -50,7 +50,7 @@ export const sendMessage = async (ctx: TelegrafContext, user: User, random: bool
                 })
             }).catch((error) => {
                 if (error == 'typeNotSupported') {
-                    ctx.reply('این نوع پیام پشتیبانی نمی‌شود لطفا برای اضافه کردن آن اینجا گزارش کنید\nhttps://gitlab.com/molaeiali/whisper2me-bot')
+                    ctx.reply('این نوع پیام پشتیبانی نمی‌شود لطفا برای اضافه کردن آن اینجا گزارش کنید\nhttps://gitlab.com/molaeiali/CumonTalktoMeBot-bot')
                 } else {
                     handleErrors(ctx, error)
                 }
@@ -120,7 +120,7 @@ export const replyStep2 = async (ctx: TelegrafContext, user: User) => {
             })
         }).catch((error) => {
             if (error == 'typeNotSupported') {
-                ctx.reply('این نوع پیام پشتیبانی نمی‌شود لطفا برای اضافه کردن آن اینجا گزارش کkید\nhttps://gitlab.com/molaeiali/whisper2me-bot')
+                ctx.reply('این نوع پیام پشتیبانی نمی‌شود لطفا برای اضافه کردن آن اینجا گزارش کkید\nhttps://gitlab.com/molaeiali/CumonTalktoMeBot-bot')
             } else if (error.code && error.code == 400 && error.description && error.description == 'Bad Request: reply message not found') {
                 user.replyingTo = null
                 replyStep2(ctx, user)

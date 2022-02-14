@@ -1,9 +1,9 @@
 {
-  "name": "whisper2me-bot",
+  "name": "CumonTalktoMeBot-bot",
   "version": "1.0.0",
   "description": "Yet another incognito messaging bot",
   "main": "build/app.js",
-  "repository": "git@gitlab.com:molaeiali/whisper2me-bot.git",
+  "repository": "git@gitlab.com:molaeiali/CumonTalktoMeBot-bot.git",
   "author": "Ali Molaei <ali.molaei@protonmail.com>",
   "license": "GPLv3",
   "private": true,
